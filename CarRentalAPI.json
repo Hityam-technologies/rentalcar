@@ -1,0 +1,639 @@
+{
+	"info": {
+		"_postman_id": "c1a2b3c4-d5e6-4f7g-8h9i-0j1k2l3m4n5o",
+		"name": "Car Rental API",
+		"description": "Production-ready Car Rental API with Auth, Cars, Bookings, Payments, and Reviews flows",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"John Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"+1234567890\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "auth", "register" ]
+						}
+					}
+				},
+				{
+					"name": "Verify Registration",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+1234567890\",\n    \"otp\": \"123456\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/verify-registration",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "auth", "verify-registration" ]
+						}
+					}
+				},
+				{
+					"name": "Login (Email/Password)",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"john@example.com\",\n    \"password\": \"password123\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "auth", "login" ]
+						}
+					}
+				},
+				{
+					"name": "Send Login OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+1234567890\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/send-login-otp",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "auth", "send-login-otp" ]
+						}
+					}
+				},
+				{
+					"name": "Login with OTP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"phone\": \"+1234567890\",\n    \"otp\": \"123456\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login-with-otp",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "auth", "login-with-otp" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/users/me",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "users", "me" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Cars",
+			"item": [
+				{
+					"name": "Get All Cars",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/cars",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "cars" ]
+						}
+					}
+				},
+				{
+					"name": "Get Nearby Cars",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/user/cars/nearby?lat=40.730610&lng=-73.935242&maxDistance=50000",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "user", "cars", "nearby" ],
+							"query": [
+								{ "key": "lat", "value": "40.730610" },
+								{ "key": "lng", "value": "-73.935242" },
+								{ "key": "maxDistance", "value": "50000" }
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Single Car",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/cars/CAR_ID_HERE",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "cars", "CAR_ID_HERE" ]
+						}
+					}
+				},
+				{
+					"name": "Create Car (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Model S\",\n  \"brand\": \"Tesla\",\n  \"type\": \"Sedan\",\n  \"pricePerDay\": 100,\n  \"fuelType\": \"Electric\",\n  \"transmission\": \"Automatic\",\n  \"seatingCapacity\": 5,\n  \"images\": [\"https://example.com/tesla.jpg\"],\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [-73.935242, 40.730610]\n  }\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/cars",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "admin", "cars" ]
+						}
+					}
+				},
+				{
+					"name": "Update Car (Admin)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Model S Updated\",\n  \"pricePerDay\": 120,\n  \"location\": {\n    \"type\": \"Point\",\n    \"coordinates\": [-73.935242, 40.730610]\n  }\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/cars/CAR_ID_HERE",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "admin", "cars", "CAR_ID_HERE" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Bookings",
+			"item": [
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carId\": \"CAR_ID_HERE\",\n  \"startDate\": \"2026-05-10T10:00:00Z\",\n  \"endDate\": \"2026-05-15T10:00:00Z\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "bookings" ]
+						}
+					}
+				},
+				{
+					"name": "Get My Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/me",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "bookings", "me" ]
+						}
+					}
+				},
+				{
+					"name": "Cancel Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings/BOOKING_ID_HERE/cancel",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "bookings", "BOOKING_ID_HERE", "cancel" ]
+						}
+					}
+				},
+				{
+					"name": "Get All Bookings (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/bookings",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "bookings" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Payments",
+			"item": [
+				{
+					"name": "Create Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": \"BOOKING_ID_HERE\",\n  \"paymentMethod\": \"card\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/payments",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "payments" ]
+						}
+					}
+				},
+				{
+					"name": "Verify Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"transactionId\": \"txn_1234567890\",\n  \"status\": \"successful\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/payments/PAYMENT_ID_HERE/verify",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "payments", "PAYMENT_ID_HERE", "verify" ]
+						}
+					}
+				},
+				{
+					"name": "Get My Payments",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/payments/me",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "payments", "me" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Reviews",
+			"item": [
+				{
+					"name": "Create Review",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"carId\": \"CAR_ID_HERE\",\n  \"bookingId\": \"BOOKING_ID_HERE\",\n  \"rating\": 5,\n  \"comment\": \"Amazing car setup!\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/reviews",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "reviews" ]
+						}
+					}
+				},
+				{
+					"name": "Get Car Reviews",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/reviews/car/CAR_ID_HERE",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "reviews", "car", "CAR_ID_HERE" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Viewer360",
+			"item": [
+				{
+					"name": "Upload 360 Video (Admin)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "video",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/admin/cars/CAR_ID_HERE/viewer360/upload",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "admin", "cars", "CAR_ID_HERE", "viewer360", "upload" ]
+						}
+					}
+				},
+				{
+					"name": "Get Spin JSON Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/viewer360/CAR_ID_HERE",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "viewer360", "CAR_ID_HERE" ]
+						}
+					}
+				},
+				{
+					"name": "View 360 Page (Browser)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/viewer360/CAR_ID_HERE",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "viewer360", "CAR_ID_HERE" ]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "Admin",
+			"item": [
+				{
+					"name": "User Management",
+					"item": [
+						{
+							"name": "Get All Users",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/users",
+									"host": [ "{{baseUrl}}" ],
+									"path": [ "api", "admin", "users" ]
+								}
+							}
+						}
+					]
+				},
+				{
+					"name": "Analytics",
+					"item": [
+						{
+							"name": "Revenue Analytics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/analytics/revenue",
+									"host": [ "{{baseUrl}}" ],
+									"path": [ "api", "admin", "analytics", "revenue" ]
+								}
+							}
+						},
+						{
+							"name": "Booking Analytics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/analytics/bookings",
+									"host": [ "{{baseUrl}}" ],
+									"path": [ "api", "admin", "analytics", "bookings" ]
+								}
+							}
+						},
+						{
+							"name": "User Analytics",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{accessToken}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{baseUrl}}/api/admin/analytics/users",
+									"host": [ "{{baseUrl}}" ],
+									"path": [ "api", "admin", "analytics", "users" ]
+								}
+							}
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "AI Assistant",
+			"item": [
+				{
+					"name": "User: Booking Help",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"prompt\": \"What cars do you have available for 5 people?\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/ai/chat",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "ai", "chat" ]
+						}
+					}
+				},
+				{
+					"name": "Admin: Business Insights",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"prompt\": \"Summarize our revenue performance and suggest fleet optimizations.\"\n}",
+							"options": {
+								"raw": { "language": "json" }
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/ai/chat",
+							"host": [ "{{baseUrl}}" ],
+							"path": [ "api", "ai", "chat" ]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
