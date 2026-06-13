@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const config = require('../config/env');
 const logger = require('../config/logger');
 const ApiError = require('../utils/ApiError');
 
@@ -15,7 +16,7 @@ const errorConverter = (err, req, res, next) => {
 
 const errorHandler = (err, req, res, next) => {
   let { statusCode, message } = err;
-  if (process.env.NODE_ENV === 'production' && !err.isOperational) {
+  if (config.isProd && !err.isOperational) {
     statusCode = 500;
     message = 'Internal Server Error';
   }
@@ -25,10 +26,10 @@ const errorHandler = (err, req, res, next) => {
   const response = {
     code: statusCode,
     message,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack }),
+    ...(config.isDev && { stack: err.stack }),
   };
 
-  if (process.env.NODE_ENV === 'development') {
+  if (config.isDev) {
     logger.error(err);
   }
 

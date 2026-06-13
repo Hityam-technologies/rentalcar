@@ -1,9 +1,7 @@
 const jwt = require('jsonwebtoken');
-const moment = require('moment'); // I forgot to install moment, I'll use native Date for now or install it.
-// Actually, let's just use standard date manipulation to keep it simple or install moment.
-// I'll install moment and validator.
+const config = require('../config/env');
 
-const generateToken = (userId, expires, type, secret = process.env.JWT_SECRET) => {
+const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
   const payload = {
     sub: userId,
     iat: Math.floor(Date.now() / 1000),
@@ -14,14 +12,11 @@ const generateToken = (userId, expires, type, secret = process.env.JWT_SECRET) =
 };
 
 const verifyToken = async (token, type) => {
-  const payload = jwt.verify(token, process.env.JWT_SECRET);
+  const payload = jwt.verify(token, config.jwt.secret);
   if (payload.type !== type) {
     throw new Error('Invalid token type');
   }
   return payload;
 };
 
-module.exports = {
-  generateToken,
-  verifyToken,
-};
+module.exports = { generateToken, verifyToken };

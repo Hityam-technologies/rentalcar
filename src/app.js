@@ -1,3 +1,4 @@
+const config = require('./config/env');
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
@@ -7,7 +8,8 @@ const routes = require('./routes');
 const { errorConverter, errorHandler } = require('./middlewares/error.middleware');
 const ApiError = require('./utils/ApiError');
 const rateLimit = require('express-rate-limit');
-const viewer360Routes = require('./modules/viewer360/viewer360.routes');
+const adminViewer360Routes = require('./admin/viewer360/viewer360.routes');
+const userViewer360Pages = require('./user/viewer360/viewer360.pages');
 
 const path = require('path');
 
@@ -32,7 +34,7 @@ app.use(
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Logging
-if (process.env.NODE_ENV !== 'test') {
+if (!config.isTest) {
   app.use(morgan('dev'));
 }
 
@@ -55,7 +57,8 @@ app.use('/api', limiter);
 
 // API routes
 app.use('/api', routes);
-app.use('/', viewer360Routes);
+app.use('/', adminViewer360Routes);
+app.use('/', userViewer360Pages);
 
 // Send back a 404 error for any unknown api request
 app.use((req, res, next) => {
