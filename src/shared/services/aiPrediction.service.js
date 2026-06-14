@@ -17,7 +17,7 @@ const generateCarPrediction = async (carData) => {
 
   try {
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-2.5-flash',
       systemInstruction: 'You are an expert AI analyst for a premium car rental platform. Your task is to analyze the details of a specific car and predict its rental demand. You must return EXACTLY a valid JSON object without any markdown wrapping or extra text. The JSON object must contain these exactly three keys: "level" (must be "High", "Medium", or "Low" based on expected demand), "tip" (a short 1-sentence actionable business insight for the admin regarding this car), and "colorTheme" (a hex color code matching the vibe/demand of the car, e.g., #10B981 for High/Eco, #F59E0B for Medium, #EF4444 for Low).',
       generationConfig: {
         responseMimeType: 'application/json',
