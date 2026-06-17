@@ -85,7 +85,7 @@ const processAdminChat = async (userId, message) => {
     });
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-2.0-flash',
+      model: 'gemini-flash-latest',
       systemInstruction: `You are ${ASSISTANT_NAME}, an admin AI for Hityam car rental. Provide actionable business insights using the data context. Be concise and specific.`,
       generationConfig: { maxOutputTokens: 800, temperature: 0.6 },
     });

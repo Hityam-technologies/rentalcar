@@ -11,8 +11,8 @@ const generateToken = (userId, expires, type, secret = config.jwt.secret) => {
   return jwt.sign(payload, secret);
 };
 
-const verifyToken = async (token, type) => {
-  const payload = jwt.verify(token, config.jwt.secret);
+const verifyToken = async (token, type, secret = config.jwt.secret) => {
+  const payload = jwt.verify(token, secret);
   if (payload.type !== type) {
     throw new Error('Invalid token type');
   }

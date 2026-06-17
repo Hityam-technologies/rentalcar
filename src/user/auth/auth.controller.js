@@ -63,6 +63,16 @@ const resetPassword = catchAsync(async (req, res) => {
   });
 });
 
+const refreshTokens = catchAsync(async (req, res) => {
+  const tokens = await authService.refreshAuthTokens(req.body.refreshToken);
+  res.send({ ...tokens });
+});
+
+const logout = catchAsync(async (req, res) => {
+  await authService.logout(req.body.refreshToken);
+  res.status(httpStatus.NO_CONTENT).send();
+});
+
 module.exports = {
   register,
   verifyRegistration,
@@ -71,4 +81,6 @@ module.exports = {
   loginWithOtp,
   sendForgotPasswordOtp,
   resetPassword,
+  refreshTokens,
+  logout,
 };

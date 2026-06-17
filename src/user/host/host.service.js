@@ -53,6 +53,7 @@ const updateListing = async (ownerId, carId, body, imagePaths = []) => {
   const car = await Car.findOne({ _id: carId, owner: ownerId });
   if (!car) throw new ApiError(httpStatus.NOT_FOUND, 'Listing not found');
   Object.assign(car, body);
+  if (body.specs) car.markModified('specs');
   if (imagePaths.length) car.images = [...car.images, ...imagePaths];
   await car.save();
   return formatCarListItem(car);

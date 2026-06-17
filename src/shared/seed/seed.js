@@ -6,6 +6,7 @@ const Car = require('../models/car.model');
 const Staff = require('../models/staff.model');
 const SpecialOffer = require('../models/specialOffer.model');
 const Banner = require('../models/banner.model');
+const Booking = require('../models/booking.model');
 
 const seed = async () => {
   await connectDB();
@@ -40,14 +41,117 @@ const seed = async () => {
 
   const demoSpinFrames = Array.from({ length: 24 }, (_, i) => `https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&spin=${i}`);
 
-  const cars = [
-    { name: 'Model 3', subtitle: 'Performance', brand: 'Tesla', type: 'Sedan', category: 'Sedan', pricePerDay: 120, isFeatured: true, rating: 4.9, images: ['https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800'], spinImages: demoSpinFrames, view360Url: `${config.baseUrl}/viewer360/`, location: { type: 'Point', coordinates: [-73.935242, 40.730610] }, locationLabel: 'Manhattan Hub', features: ['Self Driving', 'Bluetooth', 'GPS'], specs: { topSpeed: '261 km/h', acceleration: '3.1s', seats: 5 }, plateNumber: 'NY-8834', aiTip: 'Best for city commutes with instant torque.' },
-    { name: 'X5', subtitle: 'xDrive40i', brand: 'BMW', type: 'SUV', category: 'SUV', pricePerDay: 150, isFeatured: true, rating: 4.8, images: ['https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800'], location: { type: 'Point', coordinates: [-73.985428, 40.748817] }, locationLabel: 'Midtown Hub', features: ['Panoramic Roof', 'Heated Seats'], specs: { topSpeed: '245 km/h', acceleration: '5.3s', seats: 7 }, plateNumber: 'NY-5521' },
-    { name: 'Civic', subtitle: 'Touring', brand: 'Honda', type: 'Sedan', category: 'Sedan', pricePerDay: 65, rating: 4.6, images: ['https://images.unsplash.com/photo-1590362891991-f776e747a588?w=800'], location: { type: 'Point', coordinates: [-74.006, 40.7128] }, locationLabel: 'Downtown Hub', features: ['Apple CarPlay', 'Lane Assist'], specs: { seats: 5 }, plateNumber: 'NY-2290' },
-  ];
+  const cars = [];
 
   for (const car of cars) {
     await Car.findOneAndUpdate({ name: car.name, brand: car.brand }, car, { upsert: true });
+  }
+
+  const allCars = await Car.find();
+  if (allCars.length >= 3) {
+    const pastStart = new Date();
+    pastStart.setDate(pastStart.getDate() - 10);
+    const pastEnd = new Date();
+    pastEnd.setDate(pastEnd.getDate() - 5);
+
+    const currentStart = new Date();
+    currentStart.setDate(currentStart.getDate() - 1);
+    const currentEnd = new Date();
+    currentEnd.setDate(currentEnd.getDate() + 3);
+
+    const futureStart = new Date();
+    futureStart.setDate(futureStart.getDate() + 5);
+    const futureEnd = new Date();
+    futureEnd.setDate(futureEnd.getDate() + 10);
+
+    const cancelledStart = new Date();
+    cancelledStart.setDate(cancelledStart.getDate() + 15);
+    const cancelledEnd = new Date();
+    cancelledEnd.setDate(cancelledEnd.getDate() + 20);
+
+    await Booking.deleteMany({});
+    
+    // Create multiple detailed bookings
+    const bookingsToCreate = [
+      {
+        user: user._id,
+        car: allCars[0]._id,
+        host: admin._id,
+        startDate: pastStart,
+        endDate: pastEnd,
+        pickupLocation: allCars[0].locationLabel || 'City Center Hub',
+        dropoffLocation: allCars[0].locationLabel || 'City Center Hub',
+        totalPrice: (allCars[0].pricePerDay * 5) + 2000 + 1000,
+        financials: {
+          baseRate: allCars[0].pricePerDay * 5,
+          insurance: 2000,
+          tax: 1000,
+          deposit: 5000,
+          total: (allCars[0].pricePerDay * 5) + 2000 + 1000
+        },
+        status: 'completed',
+        paymentStatus: 'paid'
+      },
+      {
+        user: user._id,
+        car: allCars[1]._id,
+        host: admin._id,
+        startDate: currentStart,
+        endDate: currentEnd,
+        pickupLocation: allCars[1].locationLabel || 'Airport Hub',
+        dropoffLocation: allCars[1].locationLabel || 'Airport Hub',
+        totalPrice: (allCars[1].pricePerDay * 4) + 1500 + 800,
+        financials: {
+          baseRate: allCars[1].pricePerDay * 4,
+          insurance: 1500,
+          tax: 800,
+          deposit: 5000,
+          total: (allCars[1].pricePerDay * 4) + 1500 + 800
+        },
+        status: 'current',
+        paymentStatus: 'paid'
+      },
+      {
+        user: user._id,
+        car: allCars[2]._id,
+        host: admin._id,
+        startDate: futureStart,
+        endDate: futureEnd,
+        pickupLocation: allCars[2].locationLabel || 'Downtown Hub',
+        dropoffLocation: allCars[2].locationLabel || 'Downtown Hub',
+        totalPrice: (allCars[2].pricePerDay * 5) + 2200 + 1100,
+        financials: {
+          baseRate: allCars[2].pricePerDay * 5,
+          insurance: 2200,
+          tax: 1100,
+          deposit: 5000,
+          total: (allCars[2].pricePerDay * 5) + 2200 + 1100
+        },
+        status: 'confirmed',
+        paymentStatus: 'paid'
+      },
+      {
+        user: user._id,
+        car: allCars[0]._id, // same car, different dates
+        host: admin._id,
+        startDate: cancelledStart,
+        endDate: cancelledEnd,
+        pickupLocation: allCars[0].locationLabel || 'City Center Hub',
+        dropoffLocation: 'Airport Hub', // different dropoff
+        totalPrice: (allCars[0].pricePerDay * 5) + 2000 + 1000,
+        financials: {
+          baseRate: allCars[0].pricePerDay * 5,
+          insurance: 2000,
+          tax: 1000,
+          deposit: 5000,
+          total: (allCars[0].pricePerDay * 5) + 2000 + 1000
+        },
+        status: 'cancelled',
+        paymentStatus: 'refunded'
+      }
+    ];
+
+    await Booking.create(bookingsToCreate);
   }
 
   await Staff.findOneAndUpdate(

@@ -13,16 +13,29 @@ const getCars = catchAsync(async (req, res) => {
     search: req.query.search || req.query.q,
     isAvailable: req.query.isAvailable,
     status: req.query.status,
+    transmission: req.query.transmission,
+    fuel: req.query.fuel,
+    minSeats: req.query.minSeats,
+    startDate: req.query.startDate,
+    endDate: req.query.endDate,
   };
-  const cars = await carService.queryCars(filter);
-  res.send({ results: cars.length, data: cars });
+  
+  const options = {
+    sortBy: req.query.sortBy,
+    order: req.query.order,
+    limit: req.query.limit ? parseInt(req.query.limit, 10) : 10,
+    page: req.query.page ? parseInt(req.query.page, 10) : 1,
+  };
+
+  const result = await carService.queryCars(filter, options);
+  res.send(result);
 });
 
 const getNearbyCars = catchAsync(async (req, res) => {
   const { lat, lng } = req.query;
   if (!lat || !lng) throw new ApiError(httpStatus.BAD_REQUEST, 'Latitude and longitude are required for nearby search');
-  const cars = await carService.queryCars({ ...req.query, lat, lng });
-  res.send({ results: cars.length, data: cars });
+  const result = await carService.queryCars({ ...req.query, lat, lng });
+  res.send(result);
 });
 
 const getCar = catchAsync(async (req, res) => {

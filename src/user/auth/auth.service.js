@@ -3,9 +3,10 @@ const moment = require('moment');
 const config = require('../../config/env');
 const User = require('../../shared/models/user.model');
 const OTP = require('../../shared/models/otp.model');
+const Token = require('../../shared/models/token.model');
 const ApiError = require('../../utils/ApiError');
 const { generateOTP, hashOTP, verifyOTP } = require('../../utils/otp.util');
-const { generateToken } = require('../../utils/jwt.util');
+const { generateToken, verifyToken } = require('../../utils/jwt.util');
 
 const loginUserWithEmailAndPassword = async (email, password) => {
   const user = await User.findOne({ email }).select('+password');
@@ -76,6 +77,17 @@ const resetPasswordWithOtp = async (phone, otp, newPassword) => {
   return user;
 };
 
+const saveToken = async (token, userId, expires, type, blacklisted = false) => {
+  const tokenDoc = await Token.create({
+    token,
+    user: userId,
+    expires: expires.toDate(),
+    type,
+    blacklisted,
+  });
+  return tokenDoc;
+};
+
 const generateAuthTokens = async (user) => {
   const { access, refresh } = config.jwt;
   const accessTokenExpires = moment().add(access.amount, access.unit);
@@ -83,10 +95,38 @@ const generateAuthTokens = async (user) => {
   const refreshTokenExpires = moment().add(refresh.amount, refresh.unit);
   const refreshToken = generateToken(user.id, refreshTokenExpires.toDate(), 'refresh', config.jwt.refreshSecret);
 
+  await saveToken(refreshToken, user.id, refreshTokenExpires, 'refresh');
+
   return {
     access: { token: accessToken, expires: accessTokenExpires.toDate() },
     refresh: { token: refreshToken, expires: refreshTokenExpires.toDate() },
   };
+};
+
+const refreshAuthTokens = async (refreshToken) => {
+  try {
+    const refreshTokenDoc = await verifyToken(refreshToken, 'refresh', config.jwt.refreshSecret);
+    const user = await User.findById(refreshTokenDoc.sub);
+    if (!user) {
+      throw new Error();
+    }
+    const tokenDoc = await Token.findOne({ token: refreshToken, type: 'refresh', user: user.id, blacklisted: false });
+    if (!tokenDoc) {
+      throw new Error();
+    }
+    await Token.deleteOne({ _id: tokenDoc._id });
+    return generateAuthTokens(user);
+  } catch (error) {
+    throw new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate');
+  }
+};
+
+const logout = async (refreshToken) => {
+  const refreshTokenDoc = await Token.findOne({ token: refreshToken, type: 'refresh', blacklisted: false });
+  if (!refreshTokenDoc) {
+    throw new ApiError(httpStatus.NOT_FOUND, 'Not found');
+  }
+  await Token.deleteOne({ _id: refreshTokenDoc._id });
 };
 
 module.exports = {
@@ -96,4 +136,6 @@ module.exports = {
   sendForgotPasswordOtp,
   resetPasswordWithOtp,
   generateAuthTokens,
+  refreshAuthTokens,
+  logout,
 };

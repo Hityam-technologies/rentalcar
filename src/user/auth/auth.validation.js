@@ -43,4 +43,16 @@ const resetPassword = {
   }),
 };
 
-module.exports = { register, login, sendOtp, verifyOtp, forgotPasswordSendOtp, resetPassword };
+const refreshTokens = {
+  body: Joi.object().keys({
+    refreshToken: Joi.string().required(),
+  }),
+};
+
+const logout = {
+  body: Joi.object().keys({
+    refreshToken: Joi.string().required(),
+  }),
+};
+
+module.exports = { register, login, sendOtp, verifyOtp, forgotPasswordSendOtp, resetPassword, refreshTokens, logout };
