@@ -1,21 +1,26 @@
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const { GridFsStorage } = require('multer-gridfs-storage');
+const config = require('../../config/env');
 
 const ensureDir = (dir) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 };
 
-const imageStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '../../../uploads/images');
-    ensureDir(dir);
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `car-${unique}${path.extname(file.originalname)}`);
-  },
+const imageStorage = new GridFsStorage({
+  url: config.mongodb.uri,
+  options: { useNewUrlParser: true, useUnifiedTopology: true },
+  file: (req, file) => {
+    return new Promise((resolve, reject) => {
+      const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+      const filename = `car-${unique}${path.extname(file.originalname)}`;
+      resolve({
+        filename: filename,
+        bucketName: 'uploads'
+      });
+    });
+  }
 });
 
 const videoStorage = multer.diskStorage({

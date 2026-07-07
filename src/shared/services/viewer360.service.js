@@ -1,6 +1,7 @@
 const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
 const fs = require('fs');
+const mongoose = require('mongoose');
 const httpStatus = require('http-status').default;
 const Car = require('../models/car.model');
 const ApiError = require('../../utils/ApiError');
@@ -51,7 +52,7 @@ const extractFramesFromVideo = async (videoPath, outputFolder, carId, frameCount
         .on('error', reject);
     });
 
-    frames.push(`/uploads/frames/${filename}`);
+    frames.push(outputPath);
   }
 
   return frames;
@@ -82,9 +83,33 @@ const processVideoTo360 = async (carId, videoFile) => {
   if (!car) throw new ApiError(httpStatus.NOT_FOUND, 'Car not found');
 
   const outputFolder = path.join(__dirname, '../../../uploads/frames');
-  const frames = await extractFramesFromVideo(videoFile.path, outputFolder, carId.toString(), DEFAULT_FRAME_COUNT);
+  const localFrames = await extractFramesFromVideo(videoFile.path, outputFolder, carId.toString(), DEFAULT_FRAME_COUNT);
 
-  car.spinImages = frames;
+  const bucket = new mongoose.mongo.GridFSBucket(mongoose.connection.db, {
+    bucketName: 'uploads'
+  });
+
+  const gridFsUrls = [];
+  for (const absolutePath of localFrames) {
+    const filename = path.basename(absolutePath);
+    
+    await new Promise((resolve, reject) => {
+      fs.createReadStream(absolutePath)
+        .pipe(bucket.openUploadStream(filename, { contentType: 'image/jpeg' }))
+        .on('error', reject)
+        .on('finish', resolve);
+    });
+
+    gridFsUrls.push(`/api/media/images/${filename}`);
+    
+    try {
+      fs.unlinkSync(absolutePath);
+    } catch (e) {
+      console.error('Failed to delete temporary frame file:', e);
+    }
+  }
+
+  car.spinImages = gridFsUrls;
   car.view360Url = `${getBaseUrl()}/viewer360/${car._id}`;
   await car.save();
 

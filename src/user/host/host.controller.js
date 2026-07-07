@@ -18,7 +18,7 @@ const createListing = catchAsync(async (req, res) => {
   if (typeof req.body.specs === 'string') req.body.specs = JSON.parse(req.body.specs);
   if (typeof req.body.features === 'string') req.body.features = JSON.parse(req.body.features);
 
-  const imagePaths = (req.files || []).map((f) => `/uploads/images/${f.filename}`);
+  const imagePaths = (req.files || []).map((f) => `/api/media/images/${f.filename}`);
   const listing = await hostService.createListing(req.user._id, req.body, imagePaths);
   res.status(httpStatus.CREATED).send(listing);
 });
@@ -27,7 +27,7 @@ const updateListing = catchAsync(async (req, res) => {
   if (typeof req.body.specs === 'string') req.body.specs = JSON.parse(req.body.specs);
   if (typeof req.body.features === 'string') req.body.features = JSON.parse(req.body.features);
 
-  const imagePaths = (req.files || []).map((f) => `/uploads/images/${f.filename}`);
+  const imagePaths = (req.files || []).map((f) => `/api/media/images/${f.filename}`);
   const listing = await hostService.updateListing(req.user._id, req.params.id, req.body, imagePaths);
   res.send(listing);
 });

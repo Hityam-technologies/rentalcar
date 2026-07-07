@@ -13,13 +13,13 @@ const getCar = catchAsync(async (req, res) => {
 });
 
 const createCar = catchAsync(async (req, res) => {
-  const imagePaths = (req.files || []).map((f) => `/uploads/images/${f.filename}`);
+  const imagePaths = (req.files || []).map((f) => `/api/media/images/${f.filename}`);
   const car = await carService.createCar(req.body, imagePaths);
   res.status(httpStatus.CREATED).send(car);
 });
 
 const updateCar = catchAsync(async (req, res) => {
-  const imagePaths = (req.files || []).map((f) => `/uploads/images/${f.filename}`);
+  const imagePaths = (req.files || []).map((f) => `/api/media/images/${f.filename}`);
   const car = await carService.updateCar(req.params.carId || req.params.id, req.body, imagePaths);
   res.send(car);
 });

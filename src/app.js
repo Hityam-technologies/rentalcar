@@ -24,14 +24,14 @@ app.use(
       directives: {
         ...helmet.contentSecurityPolicy.getDefaultDirectives(),
         "script-src": ["'self'", "'unsafe-inline'", "https://code.jquery.com", "https://unpkg.com"],
-        "img-src": ["'self'", "data:", "blob:", "http://localhost:5000", "/uploads/"],
+        "img-src": ["'self'", "data:", "blob:", "http://localhost:5000", "/uploads/", "/api/media/"],
       },
     },
   })
 );
 
-// Serve static files from uploads folder
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Media routes for GridFS files
+app.use('/api/media', require('./media/media.routes'));
 
 // Logging
 if (!config.isTest) {
