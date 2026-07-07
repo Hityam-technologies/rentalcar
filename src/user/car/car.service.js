@@ -34,12 +34,23 @@ const buildQuery = (filter) => {
   }
 
   if (filter.fuel && filter.fuel !== 'All') {
-    andClauses.push({
-      $or: [
-        { fuelType: new RegExp(`^${filter.fuel}$`, 'i') },
-        { 'specs.fuel': new RegExp(`^${filter.fuel}$`, 'i') }
-      ]
-    });
+    if (filter.fuel.toLowerCase() === 'electric' || filter.fuel.toLowerCase() === 'ev') {
+      andClauses.push({
+        $or: [
+          { fuelType: new RegExp(`^(electric|ev)$`, 'i') },
+          { 'specs.fuel': new RegExp(`^(electric|ev)$`, 'i') },
+          { type: new RegExp(`^ev$`, 'i') },
+          { bodyType: new RegExp(`^ev$`, 'i') }
+        ]
+      });
+    } else {
+      andClauses.push({
+        $or: [
+          { fuelType: new RegExp(`^${filter.fuel}$`, 'i') },
+          { 'specs.fuel': new RegExp(`^${filter.fuel}$`, 'i') }
+        ]
+      });
+    }
   }
 
   if (filter.minSeats && filter.minSeats !== 'All') {
